@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>پنل مدیریت - @ViewData["Title"]</title>
+    <script src="~/lib/tailwind/tailwind.min.js"></script>
+</head>
+<body class="bg-gray-50 font-sans flex min-h-screen">
+    <aside class="w-64 bg-gray-900 text-white flex-shrink-0 transition-all duration-300">
+        <div class="p-6">
+            <h1 class="text-xl font-bold">پنل مدیریت</h1>
+        </div>
+        <nav class="mt-6">
+            <a asp-controller="Admin" asp-action="Index" class="block py-3 px-6 hover:bg-gray-800">داشبورد سفارشات</a>
+            <a asp-controller="Admin" asp-action="ManageMenu" class="block py-3 px-6 hover:bg-gray-800">مدیریت منو</a>
+            <a asp-controller="Home" asp-action="Index" class="block py-3 px-6 hover:bg-gray-800 border-t border-gray-700 mt-4">بازگشت به سایت</a>
+        </nav>
+    </aside>
+
+    <main class="flex-grow p-8">
+        <header class="mb-8 flex justify-between items-center">
+            <h2 class="text-2xl font-bold">@ViewData["Title"]</h2>
+            <div class="flex items-center gap-4">
+                <span>@User.Identity?.Name</span>
+                <a asp-controller="Account" asp-action="Logout" class="text-red-500">خروج</a>
+            </div>
+        </header>
+        <div class="bg-white p-6 rounded-lg shadow">
+            @RenderBody()
+        </div>
+    </main>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

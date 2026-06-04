@@ -1,0 +1,76 @@
+@model DanialNetFood.Web.Models.ViewModels.CartViewModel
+@{
+    ViewData["Title"] = "تکمیل سفارش";
+}
+
+<div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow">
+    <h2 class="text-2xl font-bold mb-6">جزئیات سفارش</h2>
+
+    <div class="mb-8">
+        <h3 class="text-xl font-semibold mb-4">اقلام سفارش</h3>
+        <table class="w-full text-right border-collapse">
+            <thead>
+                <tr class="border-b">
+                    <th class="py-2">نام غذا</th>
+                    <th class="py-2">تعداد</th>
+                    <th class="py-2">قیمت واحد</th>
+                    <th class="py-2">جمع</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr class="border-b">
+                        <td class="py-2">@item.FoodName</td>
+                        <td class="py-2">@item.Quantity</td>
+                        <td class="py-2">@item.Price.ToString("N0")</td>
+                        <td class="py-2">@item.Total.ToString("N0")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="flex flex-col md:flex-row justify-between items-start gap-8">
+        <div class="w-full md:w-1/2">
+            <h3 class="text-lg font-semibold mb-2">کد تخفیف</h3>
+            <div class="flex gap-2">
+                <input type="text" id="discountCode" class="border p-2 rounded flex-grow" placeholder="کد را وارد کنید">
+                <button onclick="applyDiscount()" class="bg-gray-800 text-white px-4 py-2 rounded">اعمال</button>
+            </div>
+            <p id="discountMessage" class="mt-2 text-sm"></p>
+        </div>
+
+        <div class="w-full md:w-1/3">
+            <div class="bg-gray-50 p-4 rounded">
+                <div class="flex justify-between mb-2">
+                    <span>جمع کل:</span>
+                    <span id="totalAmount">@Model.TotalAmount.ToString("N0")</span>
+                </div>
+                <div class="flex justify-between font-bold text-xl border-t pt-2 mt-2">
+                    <span>مبلغ قابل پرداخت:</span>
+                    <span id="payableAmount">@Model.TotalAmount.ToString("N0")</span>
+                </div>
+            </div>
+            <form asp-action="PlaceOrder" method="post" class="mt-4">
+                <button type="submit" class="w-full bg-red-600 text-white py-3 rounded-lg font-bold hover:bg-red-700 transition">ثبت و پرداخت نهایی</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function applyDiscount() {
+            const code = $('#discountCode').val();
+            $.post('/Order/ApplyDiscount', { code: code }, function(data) {
+                if (data.success) {
+                    $('#payableAmount').text(data.newTotal.toLocaleString());
+                    $('#discountMessage').text(data.message).addClass('text-green-600').removeClass('text-red-600');
+                } else {
+                    $('#discountMessage').text(data.message).addClass('text-red-600').removeClass('text-green-600');
+                }
+            });
+        }
+    </script>
+}

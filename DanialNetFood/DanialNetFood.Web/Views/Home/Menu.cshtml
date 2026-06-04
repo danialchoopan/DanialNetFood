@@ -1,0 +1,22 @@
+@model DanialNetFood.Web.Models.Restaurant
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="mb-8">
+    <h1 class="text-3xl font-bold">@Model.Name</h1>
+    <p class="text-gray-600">@Model.Description</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    @foreach (var food in Model.Menu)
+    {
+        <div class="bg-white p-4 rounded shadow flex justify-between items-center">
+            <div>
+                <h4 class="font-bold text-lg">@food.Name</h4>
+                <p class="text-red-600 font-semibold">@food.Price.ToString("N0") تومان</p>
+            </div>
+            <button onclick="addToCart(@food.Id)" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">افزودن</button>
+        </div>
+    }
+</div>
