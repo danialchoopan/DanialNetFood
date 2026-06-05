@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - پنل رستوران DanialNetFood</title>
+    <link rel="stylesheet" href="/css/site.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @@font-face {
+            font-family: 'Vazirmatn';
+            src: url('/fonts/Vazirmatn-Regular.woff2') format('woff2');
+        }
+        body { font-family: 'Vazirmatn', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="w-64 bg-slate-900 text-white flex flex-col">
+            <div class="p-6 text-2xl font-bold text-red-500 border-b border-slate-800">
+                DanialNetFood
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="/RestaurantAdmin/LiveOrders" class="block p-3 rounded hover:bg-slate-800 @(ViewContext.RouteData.Values["action"]?.ToString() == "LiveOrders" ? "bg-slate-800" : "")">
+                    کارتابل زنده سفارشات
+                </a>
+                <a href="/RestaurantAdmin/MenuManagement" class="block p-3 rounded hover:bg-slate-800 @(ViewContext.RouteData.Values["action"]?.ToString() == "MenuManagement" ? "bg-slate-800" : "")">
+                    مدیریت منو
+                </a>
+                <a href="/RestaurantAdmin/Settings" class="block p-3 rounded hover:bg-slate-800">
+                    تنظیمات رستوران
+                </a>
+            </nav>
+            <div class="p-4 border-t border-slate-800">
+                <a href="/Account/Logout" class="text-sm text-gray-400 hover:text-white">خروج از سیستم</a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="bg-white shadow p-4 flex justify-between items-center">
+                <h1 class="text-xl font-bold">@ViewData["Title"]</h1>
+                <div class="flex items-center space-x-4 space-x-reverse">
+                    <span class="text-sm text-gray-600">خوش آمدید، @User.Identity?.Name</span>
+                </div>
+            </header>
+            <main class="flex-1 overflow-x-hidden overflow-y-auto p-6">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <script src="/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+    <audio id="notificationSound" src="/sounds/new-order.mp3" preload="auto"></audio>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

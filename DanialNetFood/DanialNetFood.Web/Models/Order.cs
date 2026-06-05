@@ -5,8 +5,11 @@ namespace DanialNetFood.Web.Models
         public int Id { get; set; }
         public DateTime OrderDate { get; set; } = DateTime.Now;
         public decimal TotalAmount { get; set; }
-        public string Status { get; set; } = "Pending"; // Pending, Preparing, OutForDelivery, Delivered
+        public decimal CommissionAmount { get; set; }
+        public string Status { get; set; } = "Pending"; // Pending, Confirmed, Preparing, ReadyForPickup, OutForDelivery, Delivered, Cancelled
         public int UserId { get; set; }
+        public int RestaurantId { get; set; }
+        public int? DriverId { get; set; }
         public List<OrderItem> Items { get; set; } = new();
     }
 
@@ -18,5 +21,6 @@ namespace DanialNetFood.Web.Models
         public int Quantity { get; set; }
         public decimal Price { get; set; }
         public int OrderId { get; set; }
+        public List<OrderItemOption> Options { get; set; } = new();
     }
 }

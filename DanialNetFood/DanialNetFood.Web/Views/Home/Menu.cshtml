@@ -3,20 +3,62 @@
     ViewData["Title"] = Model.Name;
 }
 
-<div class="mb-8">
-    <h1 class="text-3xl font-bold">@Model.Name</h1>
-    <p class="text-gray-600">@Model.Description</p>
+<div class="mb-12 relative h-80 rounded-3xl overflow-hidden shadow-2xl">
+    <img src="@Model.ImageUrl" class="w-full h-full object-cover">
+    <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
+    <div class="absolute bottom-8 right-8 text-white">
+        <h1 class="text-5xl font-black mb-2">@Model.Name</h1>
+        <p class="text-slate-200 text-lg max-w-xl">@Model.Description</p>
+    </div>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
     @foreach (var food in Model.Menu)
     {
-        <div class="bg-white p-4 rounded shadow flex justify-between items-center">
-            <div>
-                <h4 class="font-bold text-lg">@food.Name</h4>
-                <p class="text-red-600 font-semibold">@food.Price.ToString("N0") تومان</p>
+        <div class="premium-card p-6 flex gap-6 items-start group">
+            <div class="w-32 h-32 rounded-2xl overflow-hidden flex-shrink-0 shadow-lg">
+                <img src="/images/food@(food.Id % 2 + 1).jpg" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
             </div>
-            <button onclick="addToCart(@food.Id)" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">افزودن</button>
+            <div class="flex-grow">
+                <div class="flex justify-between items-start mb-2">
+                    <h4 class="font-bold text-xl text-slate-800">@food.Name</h4>
+                    <span class="text-xs bg-slate-100 px-2 py-1 rounded text-slate-500 font-medium">@food.Category</span>
+                </div>
+
+                <div class="my-4 space-y-2">
+                    <p class="text-xs text-gray-400 font-bold mb-2">انتخاب افزودنی:</p>
+                    <!-- Options would ideally be pre-fetched or part of the model. For now hardcoded demo for the visual -->
+                    <div class="flex flex-wrap gap-2">
+                        <label class="flex items-center space-x-2 space-x-reverse text-sm cursor-pointer bg-gray-50 px-3 py-1 rounded-full hover:bg-gray-100">
+                            <input type="checkbox" name="food_@food.Id" value="1" class="rounded text-red-600">
+                            <span>نوشابه</span>
+                        </label>
+                        <label class="flex items-center space-x-2 space-x-reverse text-sm cursor-pointer bg-gray-50 px-3 py-1 rounded-full hover:bg-gray-100">
+                            <input type="checkbox" name="food_@food.Id" value="2" class="rounded text-red-600">
+                            <span>سیب‌زمینی</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-end">
+                    <p class="text-2xl font-black text-red-600">@food.Price.ToString("N0") <span class="text-xs font-normal text-slate-400">تومان</span></p>
+                    <button onclick="addWithParams(@food.Id)" class="bg-red-600 text-white px-6 py-2 rounded-xl flex items-center justify-center hover:bg-slate-900 transition-colors shadow-lg shadow-red-100 font-bold">
+                        افزودن
+                    </button>
+                </div>
+            </div>
         </div>
     }
 </div>
+
+@section Scripts {
+    <script>
+        function addWithParams(foodId) {
+            const selectedOptions = [];
+            $(`input[name="food_${foodId}"]:checked`).each(function() {
+                selectedOptions.push(parseInt($(this).val()));
+            });
+            addToCart(foodId, selectedOptions);
+        }
+    </script>
+}

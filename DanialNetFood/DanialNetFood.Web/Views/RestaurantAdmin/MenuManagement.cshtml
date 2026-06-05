@@ -1,0 +1,36 @@
+@model List<DanialNetFood.Web.Models.Food>
+@{
+    ViewData["Title"] = "مدیریت منو";
+    Layout = "_RestaurantAdminLayout";
+}
+
+<div class="bg-white p-6 rounded-lg shadow">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold">لیست غذاها</h2>
+        <a href="/RestaurantAdmin/AddFood" class="bg-red-600 text-white px-4 py-2 rounded">افزودن غذای جدید</a>
+    </div>
+
+    <table class="w-full text-right border-collapse">
+        <thead>
+            <tr class="bg-gray-50 border-b">
+                <th class="p-3">نام غذا</th>
+                <th class="p-3">دسته بندی</th>
+                <th class="p-3">قیمت پایه</th>
+                <th class="p-3">عملیات</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var food in Model)
+            {
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="p-3">@food.Name</td>
+                    <td class="p-3">@food.Category</td>
+                    <td class="p-3">@food.Price.ToString("N0") تومان</td>
+                    <td class="p-3">
+                        <a href="/RestaurantAdmin/FoodOptions?foodId=@food.Id" class="text-blue-600 hover:underline">مدیریت افزودنی‌ها</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

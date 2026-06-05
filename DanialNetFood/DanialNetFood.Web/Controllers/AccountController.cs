@@ -27,10 +27,7 @@ namespace DanialNetFood.Web.Controllers
 
             if (user != null)
             {
-                var hasher = new PasswordHasher<User>();
-                var result = hasher.VerifyHashedPassword(user, user.PasswordHash, password);
-
-                if (result == PasswordVerificationResult.Success)
+                if (BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
                 {
                     var claims = new List<Claim>
                     {
@@ -41,6 +38,10 @@ namespace DanialNetFood.Web.Controllers
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
+                    if (user.Role == "RestaurantOwner") return RedirectToAction("LiveOrders", "RestaurantAdmin");
+                    if (user.Role == "SuperAdmin") return RedirectToAction("Dashboard", "SuperAdmin");
+                    if (user.Role == "Driver") return RedirectToAction("Dashboard", "Driver");
 
                     return RedirectToAction("Index", "Home");
                 }

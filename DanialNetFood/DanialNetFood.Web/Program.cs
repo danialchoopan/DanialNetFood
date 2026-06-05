@@ -1,6 +1,7 @@
 using DanialNetFood.Web.Data;
 using DanialNetFood.Web.Data.UnitOfWork;
 using DanialNetFood.Web.Hubs;
+using DanialNetFood.Web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,6 +28,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddSingleton<IKillSwitchService, KillSwitchService>();
+builder.Services.AddScoped<IPricingService, PricingService>();
+builder.Services.AddScoped<ILocationService, LocationService>();
+builder.Services.AddScoped<IWalletService, WalletService>();
+builder.Services.AddMemoryCache();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -69,11 +75,6 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<ApplicationDbContext>();
-    if (dbProvider == "Sqlite") {
-        context.Database.EnsureCreated();
-    } else {
-        context.Database.Migrate();
-    }
     DbInitializer.Seed(context);
 }
 

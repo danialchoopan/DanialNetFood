@@ -1,8 +1,8 @@
-function addToCart(foodId) {
+function addToCart(foodId, optionIds = []) {
     $.ajax({
         url: '/Cart/AddToCart',
         type: 'POST',
-        data: { foodId: foodId },
+        data: { foodId: foodId, optionIds: optionIds },
         success: function (result) {
             $('#cart-sidebar').html(result);
         },
@@ -12,11 +12,11 @@ function addToCart(foodId) {
     });
 }
 
-function removeFromCart(foodId) {
+function removeFromCart(foodId, optionsHash = '') {
     $.ajax({
         url: '/Cart/RemoveFromCart',
         type: 'POST',
-        data: { foodId: foodId },
+        data: { foodId: foodId, optionsHash: optionsHash },
         success: function (result) {
             $('#cart-sidebar').html(result);
         },

@@ -1,0 +1,84 @@
+@model IEnumerable<DanialNetFood.Web.Models.Order>
+@{
+    ViewData["Title"] = "داشبورد مدیریت";
+    Layout = "_SuperAdminLayout";
+}
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+    <div class="bg-blue-600 text-white p-6 rounded-2xl shadow-lg">
+        <p class="text-sm opacity-80 mb-1">فروش کل</p>
+        <h4 class="text-3xl font-black">@ViewBag.TotalSales.ToString("N0") <span class="text-xs font-normal">تومان</span></h4>
+    </div>
+    <div class="bg-emerald-500 text-white p-6 rounded-2xl shadow-lg">
+        <p class="text-sm opacity-80 mb-1">تعداد سفارشات</p>
+        <h4 class="text-3xl font-black">@ViewBag.OrderCount</h4>
+    </div>
+    <div class="bg-amber-500 text-white p-6 rounded-2xl shadow-lg">
+        <p class="text-sm opacity-80 mb-1">سفارشات در انتظار</p>
+        <h4 class="text-3xl font-black">@ViewBag.PendingOrders</h4>
+    </div>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+    <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+        <h3 class="font-bold text-slate-800 text-xl">آخرین سفارشات</h3>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-right border-collapse">
+            <thead>
+                <tr class="bg-slate-50 text-slate-500 text-sm">
+                    <th class="p-4 font-bold">شناسه</th>
+                    <th class="p-4 font-bold">تاریخ</th>
+                    <th class="p-4 font-bold">مبلغ</th>
+                    <th class="p-4 font-bold">وضعیت</th>
+                    <th class="p-4 font-bold">عملیات</th>
+                </tr>
+            </thead>
+            <tbody class="text-slate-700">
+                @foreach (var order in Model)
+                {
+                    <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                        <td class="p-4 font-mono">#@order.Id</td>
+                        <td class="p-4 text-xs">@order.OrderDate.ToShortDateString()</td>
+                        <td class="p-4 font-bold">@order.TotalAmount.ToString("N0")</td>
+                        <td class="p-4">
+                            @{
+                                var statusClass = order.Status switch
+                                {
+                                    "Pending" => "bg-amber-100 text-amber-700",
+                                    "Preparing" => "bg-blue-100 text-blue-700",
+                                    "OutForDelivery" => "bg-purple-100 text-purple-700",
+                                    "Delivered" => "bg-emerald-100 text-emerald-700",
+                                    _ => "bg-slate-100 text-slate-700"
+                                };
+                            }
+                            <span id="status-@order.Id" class="px-3 py-1 rounded-full text-xs font-bold @statusClass">
+                                @order.Status
+                            </span>
+                        </td>
+                        <td class="p-4">
+                            <select onchange="updateStatus(@order.Id, this.value)" class="bg-slate-100 border-none rounded-lg text-xs p-2 focus:ring-2 focus:ring-blue-500">
+                                <option value="">تغییر وضعیت</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Preparing">Preparing</option>
+                                <option value="OutForDelivery">OutForDelivery</option>
+                                <option value="Delivered">Delivered</option>
+                            </select>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function updateStatus(orderId, status) {
+            if (!status) return;
+            $.post('/SuperAdmin/UpdateStatus', { orderId: orderId, status: status }, function() {
+                location.reload();
+            });
+        }
+    </script>
+}

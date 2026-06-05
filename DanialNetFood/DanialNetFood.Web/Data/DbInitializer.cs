@@ -1,5 +1,6 @@
 using DanialNetFood.Web.Models;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using BCrypt.Net;
 
 namespace DanialNetFood.Web.Data
 {
@@ -7,52 +8,74 @@ namespace DanialNetFood.Web.Data
     {
         public static void Seed(ApplicationDbContext context)
         {
-            if (context.Restaurants.Any()) return;
+            context.Database.EnsureCreated();
 
-            var hasher = new PasswordHasher<User>();
+            if (context.Users.Any()) return;
 
-            var restaurants = new List<Restaurant>
-            {
-                new Restaurant {
-                    Name = "رستوران دانیال",
-                    Description = "بهترین غذاهای سنتی ایرانی",
-                    ImageUrl = "/images/rest1.jpg",
-                    Menu = new List<Food>
-                    {
-                        new Food { Name = "چلو کباب سلطانی", Price = 350000, Category = "ایرانی" },
-                        new Food { Name = "خورشت قورمه سبزی", Price = 180000, Category = "ایرانی" }
-                    }
-                },
-                new Restaurant {
-                    Name = "پیتزا شب",
-                    Description = "پیتزاهای تنوری و برگرهای ذغالی",
-                    ImageUrl = "/images/rest2.jpg",
-                    Menu = new List<Food>
-                    {
-                        new Food { Name = "پیتزا مخلوط مخصوص", Price = 220000, Category = "فست فود" },
-                        new Food { Name = "چیزبرگر دوبل", Price = 195000, Category = "فست فود" }
-                    }
-                }
-            };
+            // Seed Users & Wallets
+            var users = new List<User>();
+            var roles = new[] { "Customer", "RestaurantOwner", "Driver", "SuperAdmin" };
 
+            // Core users
+            users.Add(new User { Username = "customer", PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"), Role = "Customer", Latitude = 35.70, Longitude = 51.40 });
+            users.Add(new User { Username = "owner", PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"), Role = "RestaurantOwner" });
+            users.Add(new User { Username = "driver", PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"), Role = "Driver" });
+            users.Add(new User { Username = "admin", PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"), Role = "SuperAdmin" });
+
+            // Extra users for scale
+            for(int i = 1; i <= 20; i++) {
+                users.Add(new User { Username = $"owner{i}", PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"), Role = "RestaurantOwner" });
+                users.Add(new User { Username = $"driver{i}", PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"), Role = "Driver" });
+            }
+
+            context.Users.AddRange(users);
+            context.SaveChanges();
+
+            foreach(var u in context.Users) {
+                context.Wallets.Add(new Wallet { UserId = u.Id, Balance = 1000000 });
+            }
+            context.SaveChanges();
+
+            // Seed Restaurants (20+)
+            var restaurants = new List<Restaurant>();
+            for(int i = 1; i <= 20; i++) {
+                restaurants.Add(new Restaurant {
+                    Name = $"رستوران شماره {i}",
+                    Description = $"توضیحات رستوران {i} با بهترین کیفیت",
+                    ImageUrl = $"/images/restaurant{(i%3)+1}.jpg",
+                    OwnerId = context.Users.First(u => u.Username == $"owner{i}").Id,
+                    Latitude = 35.70 + (i * 0.001),
+                    Longitude = 51.40 + (i * 0.001),
+                    ServiceRadiusKm = 5.0
+                });
+            }
             context.Restaurants.AddRange(restaurants);
+            context.SaveChanges();
 
-            var admin = new User { Username = "admin", Role = "RestaurantOwner" };
-            admin.PasswordHash = hasher.HashPassword(admin, "admin123");
+            // Seed Foods & Options
+            foreach(var r in restaurants) {
+                var foods = new List<Food> {
+                    new Food { Name = "چلو کباب سلطانی", Price = 350000, Category = "ایرانی", RestaurantId = r.Id, StockQuantity = 100 },
+                    new Food { Name = "پیتزا مخصوص", Price = 280000, Category = "فست‌فود", RestaurantId = r.Id, StockQuantity = 50 }
+                };
+                context.Foods.AddRange(foods);
+                context.SaveChanges();
 
-            var user = new User { Username = "user", Role = "Customer" };
-            user.PasswordHash = hasher.HashPassword(user, "user123");
+                foreach(var f in foods) {
+                    context.FoodOptions.AddRange(new List<FoodOption> {
+                        new FoodOption { Name = "نوشابه", Price = 25000, FoodId = f.Id, StockQuantity = 200 },
+                        new FoodOption { Name = "سس اضافه", Price = 5000, FoodId = f.Id, StockQuantity = 500 }
+                    });
+                }
+            }
+            context.SaveChanges();
 
-            context.Users.AddRange(admin, user);
-
-            var discountCodes = new List<DiscountCode>
+            var discounts = new List<DiscountCode>
             {
-                new DiscountCode { Code = "OFF20", Type = "Percentage", Value = 20 },
-                new DiscountCode { Code = "FIX50", Type = "FixedAmount", Value = 50000 }
+                new DiscountCode { Code = "WELCOME", Type = "Percentage", Value = 20, IsActive = true },
+                new DiscountCode { Code = "FIXED50", Type = "Fixed", Value = 50000, IsActive = true }
             };
-
-            context.DiscountCodes.AddRange(discountCodes);
-
+            context.DiscountCodes.AddRange(discounts);
             context.SaveChanges();
         }
     }
