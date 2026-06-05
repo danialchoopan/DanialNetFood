@@ -1,0 +1,24 @@
+Using launch settings from /app/DanialNetFood/DanialNetFood.Web/Properties/launchSettings.json...
+Building...
+/app/DanialNetFood/DanialNetFood.Web/DanialNetFood.Web.csproj : warning NU1510: PackageReference Microsoft.AspNetCore.Session will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.
+/app/DanialNetFood/DanialNetFood.Web/DanialNetFood.Web.csproj : warning NU1510: PackageReference Microsoft.AspNetCore.SignalR.Common will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.
+/app/DanialNetFood/DanialNetFood.Web/DanialNetFood.Web.csproj : warning NU1510: PackageReference Microsoft.AspNetCore.Session will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.
+/app/DanialNetFood/DanialNetFood.Web/DanialNetFood.Web.csproj : warning NU1510: PackageReference Microsoft.AspNetCore.SignalR.Common will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (13ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*) FROM "sqlite_master" WHERE "type" = 'table' AND "rootpage" IS NOT NULL;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM "Restaurants" AS "r")
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://localhost:5295
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: /app/DanialNetFood/DanialNetFood.Web
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...

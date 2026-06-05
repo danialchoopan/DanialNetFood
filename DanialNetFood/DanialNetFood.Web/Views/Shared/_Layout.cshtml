@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - DanialNetFood</title>
+    <script src="~/lib/tailwind/tailwind.min.js"></script>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body class="bg-gray-100 font-sans">
+    <header class="bg-white shadow-md p-4 sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <a asp-controller="Home" asp-action="Index" class="text-2xl font-bold text-red-600">DanialNetFood</a>
+            <nav class="space-x-4 space-x-reverse">
+                <a asp-controller="Home" asp-action="Index">رستوران‌ها</a>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <span>خوش آمدید، @User.Identity.Name</span>
+                    <a asp-controller="Account" asp-action="Logout">خروج</a>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login">ورود</a>
+                }
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto py-8 flex flex-col lg:flex-row gap-8">
+        <div class="flex-grow">
+            @RenderBody()
+        </div>
+        <aside id="cart-sidebar" class="w-full lg:w-80">
+            @await Html.PartialAsync("_CartPartial", new DanialNetFood.Web.Models.ViewModels.CartViewModel())
+        </aside>
+    </main>
+
+    <footer class="bg-gray-800 text-white p-8 mt-12">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2024 - DanialNetFood - تمامی حقوق محفوظ است</p>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/cart.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
