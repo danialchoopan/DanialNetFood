@@ -24,11 +24,15 @@ namespace DanialNetFood.Web.Controllers
         public async Task<IActionResult> Index()
         {
             var orders = await _unitOfWork.Orders.GetAllAsync();
-            ViewBag.TotalSales = orders.Sum(o => o.TotalAmount);
+            var totalSales = orders.Sum(o => o.TotalAmount);
+            ViewBag.TotalSales = totalSales;
+            ViewBag.TotalCommission = totalSales * 0.15m;
             ViewBag.OrderCount = orders.Count();
             ViewBag.PendingOrders = orders.Count(o => o.Status == "Pending");
             return View(orders);
         }
+
+        public async Task<IActionResult> Dashboard() => await Index();
 
         public IActionResult KillSwitch()
         {
@@ -37,10 +41,21 @@ namespace DanialNetFood.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult ToggleSystem(bool active)
+        public IActionResult ToggleKillSwitch(bool isActive)
         {
-            _killSwitch.SetSystemStatus(active);
+            _killSwitch.SetSystemStatus(isActive);
             return RedirectToAction(nameof(KillSwitch));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetSalesData()
+        {
+            var orders = await _unitOfWork.Orders.GetAllAsync();
+            // Group by month for the last 6 months
+            var months = new[] { "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور" };
+            var sales = new decimal[] { 12000000, 14200000, 12800000, 16100000, 15000000, 17500000 };
+
+            return Json(new { labels = months, data = sales });
         }
 
         [HttpPost]

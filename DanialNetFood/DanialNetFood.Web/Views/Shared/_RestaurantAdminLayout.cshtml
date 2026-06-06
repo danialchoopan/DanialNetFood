@@ -5,14 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - پنل رستوران DanialNetFood</title>
     <link rel="stylesheet" href="/css/site.css" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @@font-face {
-            font-family: 'Vazirmatn';
-            src: url('/fonts/Vazirmatn-Regular.woff2') format('woff2');
-        }
-        body { font-family: 'Vazirmatn', sans-serif; }
-    </style>
+    <script src="/lib/tailwind/tailwind.min.js"></script>
 </head>
 <body class="bg-gray-100">
     <div class="flex h-screen overflow-hidden">
@@ -52,7 +45,7 @@
     </div>
 
     <script src="/lib/jquery/dist/jquery.min.js"></script>
-    <script src="/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+    <script src="/lib/signalr/signalr.min.js"></script>
     <audio id="notificationSound" src="/sounds/new-order.mp3" preload="auto"></audio>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

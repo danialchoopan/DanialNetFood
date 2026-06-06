@@ -1,0 +1,32 @@
+@model DanialNetFood.Web.Models.Order
+
+<div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+    <div class="flex justify-between items-start mb-2">
+        <span class="font-bold text-sm">سفارش #@Model.Id</span>
+        <span class="text-xs text-gray-400">@Model.OrderDate.ToString("HH:mm")</span>
+    </div>
+    <div class="text-xs text-gray-600 mb-3">
+        @foreach(var item in Model.Items)
+        {
+            <div>@item.Quantity x @item.FoodName</div>
+        }
+    </div>
+    <div class="flex flex-col gap-2">
+        @if (Model.Status == "Pending")
+        {
+            <button onclick="updateStatus(@Model.Id, 'Preparing')" class="w-full py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700">تایید و شروع پخت</button>
+        }
+        else if (Model.Status == "Preparing" || Model.Status == "Confirmed")
+        {
+            <button onclick="updateStatus(@Model.Id, 'ReadyForPickup')" class="w-full py-1 bg-yellow-500 text-white text-xs rounded hover:bg-yellow-600">آماده تحویل</button>
+        }
+        else if (Model.Status == "ReadyForPickup")
+        {
+            <div class="text-center text-xs text-yellow-600 font-bold py-1 bg-yellow-50 rounded">منتظر پیک...</div>
+        }
+        else if (Model.Status == "OutForDelivery")
+        {
+            <div class="text-center text-xs text-green-600 font-bold py-1 bg-green-50 rounded">در حال ارسال</div>
+        }
+    </div>
+</div>

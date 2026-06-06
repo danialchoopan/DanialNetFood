@@ -77,6 +77,41 @@ namespace DanialNetFood.Web.Data
             };
             context.DiscountCodes.AddRange(discounts);
             context.SaveChanges();
+
+            // Seed some orders for visibility in dashboards
+            var customer = context.Users.First(u => u.Role == "Customer");
+            var restaurant = context.Restaurants.First();
+            var food = context.Foods.First(f => f.RestaurantId == restaurant.Id);
+
+            var order = new Order
+            {
+                UserId = customer.Id,
+                RestaurantId = restaurant.Id,
+                Status = "Pending",
+                TotalAmount = 450000,
+                OrderDate = DateTime.Now.AddMinutes(-30),
+                Items = new List<OrderItem>
+                {
+                    new OrderItem { FoodId = food.Id, FoodName = food.Name, Price = food.Price, Quantity = 1 }
+                }
+            };
+            context.Orders.Add(order);
+
+            var order2 = new Order
+            {
+                UserId = customer.Id,
+                RestaurantId = restaurant.Id,
+                Status = "Preparing",
+                TotalAmount = 280000,
+                OrderDate = DateTime.Now.AddHours(-1),
+                Items = new List<OrderItem>
+                {
+                    new OrderItem { FoodId = food.Id, FoodName = "پیتزا مخصوص", Price = 280000, Quantity = 1 }
+                }
+            };
+            context.Orders.Add(order2);
+
+            context.SaveChanges();
         }
     }
 }

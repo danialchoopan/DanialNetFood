@@ -28,7 +28,7 @@
                         }
                         @if (User.IsInRole("SuperAdmin"))
                         {
-                            <a asp-controller="SuperAdmin" asp-action="Index" class="text-purple-600 font-bold">پنل مدیریت کل</a>
+                            <a asp-controller="SuperAdmin" asp-action="Dashboard" class="text-purple-600 font-bold">پنل مدیریت کل</a>
                         }
                         <a asp-controller="Account" asp-action="Logout" class="bg-slate-100 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-200 transition">خروج</a>
                     </div>
@@ -46,7 +46,7 @@
             @RenderBody()
         </div>
         <aside id="cart-sidebar" class="w-full lg:w-96 cart-sidebar">
-            @await Html.PartialAsync("_CartPartial", new DanialNetFood.Web.Models.ViewModels.CartViewModel())
+            @await Component.InvokeAsync("Cart")
         </aside>
     </main>
 
