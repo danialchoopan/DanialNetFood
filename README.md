@@ -1,6 +1,6 @@
 # سامانه جامع DanialNetFood
 
-سامانه DanialNetFood یک پلتفرم یکپارچه (Monolith) برای مدیریت و سفارش غذا است که با استفاده از تکنولوژی‌های مدرن دات‌نت و با تمرکز بر عملکرد بالا و تجربه کاربری بومی طراحی شده است. این پروژه نمایشی از تسلط بر چرخه زندگی درخواست‌ها در ASP.NET Core MVC، مدیریت نشست‌های ایمن، و تعاملات آنی با SignalR است.
+سامانه DanialNetFood یک پلتفرم یکپارچه برای مدیریت و سفارش غذا است که با استفاده از تکنولوژی‌های مدرن دات‌نت و با تمرکز بر عملکرد بالا و تجربه کاربری بومی طراحی شده است. این پروژه نمایشی از تسلط بر چرخه زندگی درخواست‌ها در ASP.NET Core MVC، مدیریت نشست‌های ایمن، و تعاملات آنی با SignalR است.
 
 ## ویژگی‌های کلیدی
 
@@ -10,6 +10,20 @@
 *   **سیستم تخفیف داینامیک:** استفاده از Strategy Pattern برای اعمال انواع تخفیف‌های درصدی و مبلغ ثابت.
 *   **امنیت پیشرفته:** استفاده از Cookie Authentication و هش‌گذاری گذرواژه‌ها با الگوریتم BCrypt.
 *   **قابلیت‌های سازمانی:** مدیریت کیف پول کاربر، سیستم بررسی محدوده جغرافیایی (Geofencing) و سوئیچ توقف اضطراری (Kill Switch).
+
+## اسکرین‌شات‌های سامانه
+
+### صفحه اصلی و لیست رستوران‌ها
+![صفحه اصلی](./DanialNetFood/DanialNetFood.Web/screenshots/home.png)
+
+### منوی رستوران و سبد خرید شناور
+![منو و سبد خرید](./DanialNetFood/DanialNetFood.Web/screenshots/menu_cart.png)
+
+### پنل مدیریت رستوران و پیگیری زنده سفارشات
+![پنل مدیریت رستوران](./DanialNetFood/DanialNetFood.Web/screenshots/restaurant_pipeline.png)
+
+### داشبورد آنالیز فروش (مدیریت کل)
+![آنالیز فروش](./DanialNetFood/DanialNetFood.Web/screenshots/admin_analytics.png)
 
 ## تکنولوژی‌های مورد استفاده
 
@@ -37,20 +51,6 @@
    - **رستوران‌دار:** `owner` / `123456`
    - **سفیر:** `driver` / `123456`
    - **مشتری:** `customer` / `123456`
-
-## اسکرین‌شات‌های سامانه
-
-### صفحه اصلی و لیست رستوران‌ها
-![صفحه اصلی](./DanialNetFood/DanialNetFood.Web/screenshots/home.png)
-
-### منوی رستوران و سبد خرید شناور
-![منو و سبد خرید](./DanialNetFood/DanialNetFood.Web/screenshots/menu_cart.png)
-
-### پنل مدیریت رستوران و پیگیری زنده سفارشات
-![پنل مدیریت رستوران](./DanialNetFood/DanialNetFood.Web/screenshots/restaurant_pipeline.png)
-
-### داشبورد آنالیز فروش (مدیریت کل)
-![آنالیز فروش](./DanialNetFood/DanialNetFood.Web/screenshots/admin_analytics.png)
 
 ## ساختار پروژه
 
