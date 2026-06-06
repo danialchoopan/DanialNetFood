@@ -1,0 +1,28 @@
+
+Running 1 test using 1 worker
+
+  ✘  1 capture_enterprise.spec.ts:3:5 › capture enterprise screenshots (30.1s)
+
+
+  1) capture_enterprise.spec.ts:3:5 › capture enterprise screenshots ───────────────────────────────
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.waitForURL: Test timeout of 30000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "**/RestaurantAdmin/LiveOrders" until "load"
+    ============================================================
+
+      12 |   await page.fill('input[name="password"]', '123456');
+      13 |   await page.click('button[type="submit"]');
+    > 14 |   await page.waitForURL('**/RestaurantAdmin/LiveOrders');
+         |              ^
+      15 |   await page.screenshot({ path: 'DanialNetFood/DanialNetFood.Web/screenshots/restaurant_pipeline.png', fullPage: true });
+      16 |
+      17 |   // 3. Super Admin Dashboard
+        at /app/capture_enterprise.spec.ts:14:14
+
+    Error Context: test-results/capture_enterprise-capture-enterprise-screenshots/error-context.md
+
+  1 failed
+    capture_enterprise.spec.ts:3:5 › capture enterprise screenshots ────────────────────────────────

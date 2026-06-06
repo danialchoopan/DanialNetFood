@@ -1,52 +1,95 @@
 @model DanialNetFood.Web.Models.Order
+@{
+    ViewData["Title"] = "پیگیری زنده سفارش";
+}
 
-<div class="max-w-2xl mx-auto p-6 bg-white shadow rounded">
-    <h2 class="text-2xl font-bold mb-6">پیگیری سفارش #@Model.Id</h2>
+<div class="max-w-3xl mx-auto py-12 px-6">
+    <div class="bg-white shadow-2xl rounded-3xl overflow-hidden">
+        <div class="bg-red-600 p-8 text-white">
+            <div class="flex justify-between items-center">
+                <h2 class="text-3xl font-black">رهگیری سفارش #@Model.Id</h2>
+                <span class="bg-white/20 px-4 py-1 rounded-full text-sm">@Model.OrderDate.ToString("HH:mm")</span>
+            </div>
+        </div>
 
-    <div id="status-container" class="space-y-4">
-        <div id="step-Pending" class="p-4 border rounded @(Model.Status == "Pending" ? "bg-blue-100 border-blue-500" : "bg-gray-50")">
-            <p class="font-bold">ثبت شده</p>
-        </div>
-        <div id="step-Preparing" class="p-4 border rounded @(Model.Status == "Preparing" ? "bg-blue-100 border-blue-500" : "bg-gray-50")">
-            <p class="font-bold">در حال آماده‌سازی</p>
-        </div>
-        <div id="step-OutForDelivery" class="p-4 border rounded @(Model.Status == "OutForDelivery" ? "bg-blue-100 border-blue-500" : "bg-gray-50")">
-            <p class="font-bold">ارسال شده</p>
-        </div>
-        <div id="step-Delivered" class="p-4 border rounded @(Model.Status == "Delivered" ? "bg-green-100 border-green-500" : "bg-gray-50")">
-            <p class="font-bold">تحویل داده شد</p>
+        <div class="p-8">
+            <!-- Progress Stepper -->
+            <div class="relative mb-12">
+                <div class="absolute left-0 top-1/2 w-full h-1 bg-gray-100 -translate-y-1/2"></div>
+                <div id="progress-bar" class="absolute left-0 top-1/2 h-1 bg-green-500 -translate-y-1/2 transition-all duration-1000" style="width: 0%"></div>
+
+                <div class="relative flex justify-between">
+                    @{
+                        var statuses = new[] {
+                            new { Key = "Pending", Label = "ثبت شده" },
+                            new { Key = "Preparing", Label = "آماده‌سازی" },
+                            new { Key = "ReadyForPickup", Label = "آماده ارسال" },
+                            new { Key = "OutForDelivery", Label = "در راه" },
+                            new { Key = "Delivered", Label = "رسید!" }
+                        };
+                    }
+                    @foreach(var s in statuses) {
+                        <div id="dot-@s.Key" class="w-10 h-10 rounded-full bg-white border-4 border-gray-200 z-10 flex items-center justify-center transition-colors duration-500">
+                            <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                        </div>
+                    }
+                </div>
+                <div class="flex justify-between mt-4 px-1">
+                    @foreach(var s in statuses) {
+                        <span id="text-@s.Key" class="text-xs font-bold text-gray-400">@s.Label</span>
+                    }
+                </div>
+            </div>
+
+            <div class="border-t pt-8">
+                <h3 class="font-bold text-lg mb-4">جزییات سفارش</h3>
+                <div class="space-y-3">
+                    @foreach(var item in Model.Items) {
+                        <div class="flex justify-between">
+                            <span>@item.Quantity x @item.FoodName</span>
+                            <span class="font-bold">@item.Price.ToString("N0") تومان</span>
+                        </div>
+                    }
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
-    <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
     <script>
+        const statusOrder = ["Pending", "Preparing", "ReadyForPickup", "OutForDelivery", "Delivered"];
+
+        function updateUI(status) {
+            const index = statusOrder.indexOf(status);
+            const progress = (index / (statusOrder.length - 1)) * 100;
+            document.getElementById("progress-bar").style.width = progress + "%";
+
+            statusOrder.forEach((s, i) => {
+                const dot = document.getElementById("dot-" + s);
+                const text = document.getElementById("text-" + s);
+                if(i <= index) {
+                    dot.classList.remove("border-gray-200");
+                    dot.classList.add("border-green-500");
+                    dot.querySelector('div').classList.remove("bg-gray-300");
+                    dot.querySelector('div').classList.add("bg-green-500");
+                    text.classList.remove("text-gray-400");
+                    text.classList.add("text-green-600");
+                }
+            });
+        }
+
         const connection = new signalR.HubConnectionBuilder()
             .withUrl("/orderHub")
             .build();
 
-        connection.on("ReceiveStatusUpdate", function (status) {
-            updateStatusUI(status);
+        connection.on("ReceiveStatusUpdate", function (id, status) {
+            updateUI(status);
         });
 
         connection.start().then(function () {
-            connection.invoke("JoinOrderGroup", @Model.Id);
-        }).catch(err => console.error(err));
-
-        function updateStatusUI(status) {
-            const steps = ["Pending", "Preparing", "OutForDelivery", "Delivered"];
-            steps.forEach(s => {
-                const el = document.getElementById("step-" + s);
-                el.className = "p-4 border rounded bg-gray-50";
-            });
-
-            const currentEl = document.getElementById("step-" + status);
-            if (status === "Delivered") {
-                currentEl.className = "p-4 border rounded bg-green-100 border-green-500";
-            } else {
-                currentEl.className = "p-4 border rounded bg-blue-100 border-blue-500";
-            }
-        }
+            connection.invoke("JoinOrderGroup", "@Model.Id");
+            updateUI("@Model.Status");
+        });
     </script>
 }

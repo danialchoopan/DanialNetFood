@@ -1,0 +1,40 @@
+@model List<DanialNetFood.Web.Models.FoodOption>
+@{
+    ViewData["Title"] = "مدیریت افزودنی‌ها";
+    Layout = "_RestaurantAdminLayout";
+}
+
+<div class="bg-white p-6 rounded-lg shadow">
+    <h2 class="text-xl font-bold mb-6">افزودنی‌های غذا</h2>
+
+    <form action="/RestaurantAdmin/AddOption" method="post" class="flex items-end space-x-4 space-x-reverse mb-8">
+        <input type="hidden" name="FoodId" value="@ViewBag.FoodId" />
+        <div class="flex-1">
+            <label class="block text-sm font-medium text-gray-700">نام افزودنی</label>
+            <input type="text" name="Name" required class="mt-1 block w-full border rounded p-2" />
+        </div>
+        <div class="w-32">
+            <label class="block text-sm font-medium text-gray-700">قیمت (تومان)</label>
+            <input type="number" name="Price" required class="mt-1 block w-full border rounded p-2" />
+        </div>
+        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded h-10">ثبت</button>
+    </form>
+
+    <table class="w-full text-right border-collapse">
+        <thead>
+            <tr class="bg-gray-50 border-b">
+                <th class="p-3">نام</th>
+                <th class="p-3">قیمت</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var opt in Model)
+            {
+                <tr class="border-b">
+                    <td class="p-3">@opt.Name</td>
+                    <td class="p-3">@opt.Price.ToString("N0") تومان</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

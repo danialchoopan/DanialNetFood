@@ -10,6 +10,11 @@ namespace DanialNetFood.Web.Models
         [Required]
         public string PasswordHash { get; set; } = string.Empty;
         [Required]
-        public string Role { get; set; } = "Customer"; // Customer or RestaurantOwner
+        public string Role { get; set; } = "Customer"; // Customer, RestaurantOwner, Driver, SuperAdmin
+
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
+
+        public Wallet? Wallet { get; set; }
     }
 }

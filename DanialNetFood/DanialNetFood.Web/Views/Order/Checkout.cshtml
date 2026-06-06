@@ -53,7 +53,17 @@
                 </div>
             </div>
             <form asp-action="PlaceOrder" method="post" class="mt-4">
-                <button type="submit" class="w-full bg-red-600 text-white py-3 rounded-lg font-bold hover:bg-red-700 transition">ثبت و پرداخت نهایی</button>
+                @if (ViewBag.GeofenceError != null)
+                {
+                    <div class="bg-red-50 text-red-600 p-3 rounded mb-3 text-sm font-bold">
+                        @ViewBag.GeofenceError
+                    </div>
+                    <button type="button" disabled class="w-full bg-gray-400 text-white py-3 rounded-lg font-bold cursor-not-allowed">خارج از محدوده</button>
+                }
+                else
+                {
+                    <button type="submit" class="w-full bg-red-600 text-white py-3 rounded-lg font-bold hover:bg-red-700 transition">ثبت و پرداخت نهایی</button>
+                }
             </form>
         </div>
     </div>

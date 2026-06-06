@@ -1,28 +1,71 @@
 @model DanialNetFood.Web.Models.ViewModels.CartViewModel
 
-<div id="cart-container" class="p-4 bg-white shadow-lg rounded-lg">
-    <h3 class="text-xl font-bold mb-4">سبد خرید</h3>
-    @if (Model.Items.Any())
-    {
-        <ul>
-            @foreach (var item in Model.Items)
-            {
-                <li class="flex justify-between items-center mb-2 border-b pb-2">
-                    <div>
-                        <p class="font-semibold">@item.FoodName</p>
-                        <p class="text-sm text-gray-600">@item.Quantity x @item.Price.ToString("N0") تومان</p>
-                    </div>
-                    <button onclick="removeFromCart(@item.FoodId)" class="text-red-500 hover:text-red-700">حذف</button>
-                </li>
-            }
-        </ul>
-        <div class="mt-4 pt-4 border-t">
-            <p class="text-lg font-bold">جمع کل: @Model.TotalAmount.ToString("N0") تومان</p>
-            <a asp-controller="Order" asp-action="Checkout" class="block w-full mt-4 bg-green-500 text-white text-center py-2 rounded hover:bg-green-600 transition">تکمیل سفارش</a>
+<div id="cart-container" class="bg-white shadow-xl rounded-2xl border border-slate-100 overflow-hidden">
+    <div class="bg-slate-900 text-white p-5">
+        <div class="flex items-center justify-between">
+            <h3 class="text-xl font-bold">سبد خرید شما</h3>
+            <span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">@Model.Items.Sum(i => i.Quantity) کالا</span>
         </div>
-    }
-    else
-    {
-        <p class="text-gray-500 text-center">سبد خرید شما خالی است.</p>
-    }
+    </div>
+
+    <div class="p-5">
+        @if (Model.Items.Any())
+        {
+            <ul class="space-y-4 max-h-[50vh] overflow-y-auto pr-1">
+                @foreach (var item in Model.Items)
+                {
+                    <li class="flex justify-between items-center group border-b border-slate-50 pb-3 last:border-0">
+                        <div class="flex-grow">
+                            <p class="font-bold text-slate-800">@item.FoodName</p>
+                            @if (item.Options.Any())
+                            {
+                                <div class="flex flex-wrap gap-1 mt-1">
+                                    @foreach (var opt in item.Options)
+                                    {
+                                        <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">@opt.Name</span>
+                                    }
+                                </div>
+                            }
+                            <p class="text-xs text-slate-500 mt-1">@item.Quantity × @((item.Price + item.Options.Sum(o => o.Price)).ToString("N0")) تومان</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-slate-700">@item.Total.ToString("N0")</span>
+                            <button onclick="removeFromCart(@item.FoodId, '@item.GetOptionsHash()')" class="text-slate-300 hover:text-red-500 transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                    </li>
+                }
+            </ul>
+
+            <div class="mt-6 pt-6 border-t border-slate-100">
+                @if (Model.DiscountAmount > 0)
+                {
+                    <div class="flex justify-between items-center mb-2 text-green-600 text-sm">
+                        <span>تخفیف (@Model.DiscountCode)</span>
+                        <span class="font-bold">- @Model.DiscountAmount.ToString("N0")</span>
+                    </div>
+                }
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-slate-500">جمع کل سفارش</span>
+                    <span class="text-2xl font-black text-slate-900">@Model.FinalAmount.ToString("N0") <span class="text-sm font-normal">تومان</span></span>
+                </div>
+                <a asp-controller="Order" asp-action="Checkout" class="block w-full bg-red-600 text-white text-center py-4 rounded-xl font-bold hover:bg-red-700 shadow-lg shadow-red-200 transition-all active:scale-95">تکمیل و پرداخت</a>
+            </div>
+        }
+        else
+        {
+            <div class="py-12 text-center">
+                <div class="bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                </div>
+                <p class="text-slate-400 font-medium">سبد خرید شما فعلاً خالی است.</p>
+                <p class="text-xs text-slate-300 mt-2">خوشمزه‌ترین غذاها در انتظار شما هستند!</p>
+            </div>
+        }
+    </div>
 </div>

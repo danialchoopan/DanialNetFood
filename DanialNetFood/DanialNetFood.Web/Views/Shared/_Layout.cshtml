@@ -7,37 +7,74 @@
     <script src="~/lib/tailwind/tailwind.min.js"></script>
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
-<body class="bg-gray-100 font-sans">
-    <header class="bg-white shadow-md p-4 sticky top-0 z-50">
+<body class="bg-slate-50 font-sans">
+    <header class="bg-white/80 backdrop-blur-md shadow-sm p-4 sticky top-0 z-50 border-b border-slate-100">
         <div class="container mx-auto flex justify-between items-center">
-            <a asp-controller="Home" asp-action="Index" class="text-2xl font-bold text-red-600">DanialNetFood</a>
-            <nav class="space-x-4 space-x-reverse">
-                <a asp-controller="Home" asp-action="Index">رستوران‌ها</a>
+            <div class="flex items-center gap-8">
+                <a asp-controller="Home" asp-action="Index" class="text-3xl font-black text-red-600 tracking-tighter">DanialNetFood</a>
+                <nav class="hidden md:flex space-x-6 space-x-reverse text-slate-600 font-medium">
+                    <a asp-controller="Home" asp-action="Index" class="hover:text-red-600 transition">رستوران‌ها</a>
+                    <a href="#" class="hover:text-red-600 transition">پیشنهادهای ویژه</a>
+                </nav>
+            </div>
+            <div class="flex items-center gap-4">
                 @if (User.Identity?.IsAuthenticated == true)
                 {
-                    <span>خوش آمدید، @User.Identity.Name</span>
-                    <a asp-controller="Account" asp-action="Logout">خروج</a>
+                    <div class="flex items-center gap-3">
+                        <span class="text-slate-700">@User.Identity.Name خوش آمدی</span>
+                        @if (User.IsInRole("RestaurantOwner"))
+                        {
+                            <a asp-controller="RestaurantAdmin" asp-action="LiveOrders" class="text-blue-600 font-bold">پنل رستوران</a>
+                        }
+                        @if (User.IsInRole("SuperAdmin"))
+                        {
+                            <a asp-controller="SuperAdmin" asp-action="Dashboard" class="text-purple-600 font-bold">پنل مدیریت کل</a>
+                        }
+                        <a asp-controller="Account" asp-action="Logout" class="bg-slate-100 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-200 transition">خروج</a>
+                    </div>
                 }
                 else
                 {
-                    <a asp-controller="Account" asp-action="Login">ورود</a>
+                    <a asp-controller="Account" asp-action="Login" class="btn-premium">ورود / عضویت</a>
                 }
-            </nav>
+            </div>
         </div>
     </header>
 
-    <main class="container mx-auto py-8 flex flex-col lg:flex-row gap-8">
+    <main class="container mx-auto py-10 px-4 flex flex-col lg:flex-row gap-8">
         <div class="flex-grow">
             @RenderBody()
         </div>
-        <aside id="cart-sidebar" class="w-full lg:w-80">
-            @await Html.PartialAsync("_CartPartial", new DanialNetFood.Web.Models.ViewModels.CartViewModel())
+        <aside id="cart-sidebar" class="w-full lg:w-96 cart-sidebar">
+            @await Component.InvokeAsync("Cart")
         </aside>
     </main>
 
-    <footer class="bg-gray-800 text-white p-8 mt-12">
-        <div class="container mx-auto text-center">
-            <p>&copy; 2024 - DanialNetFood - تمامی حقوق محفوظ است</p>
+    <footer class="bg-slate-900 text-slate-300 py-12 mt-20 border-t border-slate-800">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-right">
+                <div>
+                    <h4 class="text-white text-xl font-bold mb-4">DanialNetFood</h4>
+                    <p class="text-sm leading-relaxed">تجربه بهترین طعم‌ها با سریع‌ترین ارسال در سامانه هوشمند دانیال نت فود.</p>
+                </div>
+                <div>
+                    <h4 class="text-white text-lg font-bold mb-4">دسترسی سریع</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white transition">درباره ما</a></li>
+                        <li><a href="#" class="hover:text-white transition">تماس با ما</a></li>
+                        <li><a href="#" class="hover:text-white transition">قوانین و مقررات</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white text-lg font-bold mb-4">ما را دنبال کنید</h4>
+                    <div class="flex justify-center md:justify-start gap-4">
+                        <span class="text-sm italic">ارتباط با پشتیبانی: ۰۲۱-۱۲۳۴۵۶۷۸</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-12 pt-8 border-t border-slate-800 text-center text-xs text-slate-500">
+                <p>&copy; 2026 - DanialNetFood - تمامی حقوق محفوظ است</p>
+            </div>
         </div>
     </footer>
 

@@ -22,20 +22,45 @@ namespace DanialNetFood.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddToCart(int foodId)
+        public async Task<IActionResult> AddToCart(int foodId, List<int> optionIds)
         {
             var food = await _unitOfWork.Foods.GetByIdAsync(foodId);
             if (food == null) return NotFound();
 
             var cart = GetCartFromSession();
-            var item = cart.Items.FirstOrDefault(i => i.FoodId == foodId);
-            if (item == null)
+
+            var cartItemOptions = new List<CartItemOption>();
+            if (optionIds != null)
             {
-                cart.Items.Add(new CartItem { FoodId = food.Id, FoodName = food.Name, Price = food.Price, Quantity = 1 });
+                foreach (var optId in optionIds)
+                {
+                    var opt = await _unitOfWork.FoodOptions.GetByIdAsync(optId);
+                    if (opt != null)
+                    {
+                        cartItemOptions.Add(new CartItemOption { Id = opt.Id, Name = opt.Name, Price = opt.Price });
+                    }
+                }
+            }
+
+            // Create a sorted list of IDs to use as a key for item differentiation
+            var sortedOptionIds = cartItemOptions.Select(o => o.Id).OrderBy(id => id).ToList();
+
+            var existingItem = cart.Items.FirstOrDefault(i => i.FoodId == foodId &&
+                i.Options.Select(o => o.Id).OrderBy(id => id).SequenceEqual(sortedOptionIds));
+
+            if (existingItem == null)
+            {
+                cart.Items.Add(new CartItem {
+                    FoodId = food.Id,
+                    FoodName = food.Name,
+                    Price = food.Price,
+                    Quantity = 1,
+                    Options = cartItemOptions
+                });
             }
             else
             {
-                item.Quantity++;
+                existingItem.Quantity++;
             }
 
             SaveCartToSession(cart);
@@ -43,14 +68,28 @@ namespace DanialNetFood.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult RemoveFromCart(int foodId)
+        public IActionResult RemoveFromCart(int foodId, string? optionsHash)
         {
             var cart = GetCartFromSession();
-            var item = cart.Items.FirstOrDefault(i => i.FoodId == foodId);
-            if (item != null)
+
+            // If optionsHash is provided, match exactly. Otherwise (legacy), match foodId.
+            CartItem? itemToRemove;
+            if (!string.IsNullOrEmpty(optionsHash))
             {
-                cart.Items.Remove(item);
+                itemToRemove = cart.Items.FirstOrDefault(i =>
+                    i.FoodId == foodId &&
+                    string.Join(",", i.Options.Select(o => o.Id).OrderBy(id => id)) == optionsHash);
             }
+            else
+            {
+                itemToRemove = cart.Items.FirstOrDefault(i => i.FoodId == foodId);
+            }
+
+            if (itemToRemove != null)
+            {
+                cart.Items.Remove(itemToRemove);
+            }
+
             SaveCartToSession(cart);
             return PartialView("_CartPartial", cart);
         }

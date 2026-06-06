@@ -1,0 +1,814 @@
+Using launch settings from /app/DanialNetFood/DanialNetFood.Web/Properties/launchSettings.json...
+Building...
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (17ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      PRAGMA journal_mode = 'wal';
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE "DiscountCodes" (
+          "Id" INTEGER NOT NULL CONSTRAINT "PK_DiscountCodes" PRIMARY KEY AUTOINCREMENT,
+          "Code" TEXT NOT NULL,
+          "Type" TEXT NOT NULL,
+          "Value" TEXT NOT NULL,
+          "IsActive" INTEGER NOT NULL
+      );
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE "Orders" (
+          "Id" INTEGER NOT NULL CONSTRAINT "PK_Orders" PRIMARY KEY AUTOINCREMENT,
+          "OrderDate" TEXT NOT NULL,
+          "TotalAmount" TEXT NOT NULL,
+          "CommissionAmount" TEXT NOT NULL,
+          "Status" TEXT NOT NULL,
+          "UserId" INTEGER NOT NULL,
+          "RestaurantId" INTEGER NOT NULL,
+          "DriverId" INTEGER NULL
+      );
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE "Restaurants" (
+          "Id" INTEGER NOT NULL CONSTRAINT "PK_Restaurants" PRIMARY KEY AUTOINCREMENT,
+          "Name" TEXT NOT NULL,
+          "Description" TEXT NOT NULL,
+          "ImageUrl" TEXT NOT NULL,
+          "OwnerId" INTEGER NOT NULL,
+          "Latitude" REAL NOT NULL,
+          "Longitude" REAL NOT NULL,
+          "ServiceRadiusKm" REAL NOT NULL
+      );
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE "Users" (
+          "Id" INTEGER NOT NULL CONSTRAINT "PK_Users" PRIMARY KEY AUTOINCREMENT,
+          "Username" TEXT NOT NULL,
+          "PasswordHash" TEXT NOT NULL,
+          "Role" TEXT NOT NULL,
+          "Latitude" REAL NULL,
+          "Longitude" REAL NULL
+      );
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE "OrderItems" (
+          "Id" INTEGER NOT NULL CONSTRAINT "PK_OrderItems" PRIMARY KEY AUTOINCREMENT,
+          "FoodId" INTEGER NOT NULL,
+          "FoodName" TEXT NOT NULL,
+          "Quantity" INTEGER NOT NULL,
+          "Price" TEXT NOT NULL,
+          "OrderId" INTEGER NOT NULL,
+          CONSTRAINT "FK_OrderItems_Orders_OrderId" FOREIGN KEY ("OrderId") REFERENCES "Orders" ("Id") ON DELETE CASCADE
+      );
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE "Foods" (
+          "Id" INTEGER NOT NULL CONSTRAINT "PK_Foods" PRIMARY KEY AUTOINCREMENT,
+          "Name" TEXT NOT NULL,
+          "Price" TEXT NOT NULL,
+          "Category" TEXT NOT NULL,
+          "RestaurantId" INTEGER NOT NULL,
+          "StockQuantity" INTEGER NOT NULL,
+          "RowVersion" BLOB NOT NULL,
+          CONSTRAINT "FK_Foods_Restaurants_RestaurantId" FOREIGN KEY ("RestaurantId") REFERENCES "Restaurants" ("Id") ON DELETE CASCADE
+      );
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE "Wallets" (
+          "UserId" INTEGER NOT NULL CONSTRAINT "PK_Wallets" PRIMARY KEY,
+          "Balance" TEXT NOT NULL,
+          CONSTRAINT "FK_Wallets_Users_UserId" FOREIGN KEY ("UserId") REFERENCES "Users" ("Id") ON DELETE CASCADE
+      );
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE "OrderItemOptions" (
+          "Id" INTEGER NOT NULL CONSTRAINT "PK_OrderItemOptions" PRIMARY KEY AUTOINCREMENT,
+          "OrderItemId" INTEGER NOT NULL,
+          "FoodOptionId" INTEGER NOT NULL,
+          "OptionName" TEXT NOT NULL,
+          "Price" TEXT NOT NULL,
+          CONSTRAINT "FK_OrderItemOptions_OrderItems_OrderItemId" FOREIGN KEY ("OrderItemId") REFERENCES "OrderItems" ("Id") ON DELETE CASCADE
+      );
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE "FoodOptions" (
+          "Id" INTEGER NOT NULL CONSTRAINT "PK_FoodOptions" PRIMARY KEY AUTOINCREMENT,
+          "Name" TEXT NOT NULL,
+          "Price" TEXT NOT NULL,
+          "FoodId" INTEGER NOT NULL,
+          "StockQuantity" INTEGER NOT NULL,
+          "RowVersion" BLOB NOT NULL,
+          CONSTRAINT "FK_FoodOptions_Foods_FoodId" FOREIGN KEY ("FoodId") REFERENCES "Foods" ("Id") ON DELETE CASCADE
+      );
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE "WalletTransactions" (
+          "Id" INTEGER NOT NULL CONSTRAINT "PK_WalletTransactions" PRIMARY KEY AUTOINCREMENT,
+          "WalletUserId" INTEGER NOT NULL,
+          "Amount" TEXT NOT NULL,
+          "Type" TEXT NOT NULL,
+          "Description" TEXT NOT NULL,
+          "TransactionDate" TEXT NOT NULL,
+          CONSTRAINT "FK_WalletTransactions_Wallets_WalletUserId" FOREIGN KEY ("WalletUserId") REFERENCES "Wallets" ("UserId") ON DELETE CASCADE
+      );
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE INDEX "IX_FoodOptions_FoodId" ON "FoodOptions" ("FoodId");
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE INDEX "IX_Foods_RestaurantId" ON "Foods" ("RestaurantId");
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE INDEX "IX_OrderItemOptions_OrderItemId" ON "OrderItemOptions" ("OrderItemId");
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE INDEX "IX_OrderItems_OrderId" ON "OrderItems" ("OrderId");
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE INDEX "IX_WalletTransactions_WalletUserId" ON "WalletTransactions" ("WalletUserId");
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM "Users" AS "u")
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (6ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 8), @p4='?' (Size = 8)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 15), @p4='?' (Size = 5)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 6), @p4='?' (Size = 6)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 10), @p4='?' (Size = 5)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 15), @p4='?' (Size = 6)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 6), @p4='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 15), @p4='?' (Size = 6)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 6), @p4='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 15), @p4='?' (Size = 6)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 6), @p4='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 15), @p4='?' (Size = 6)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 6), @p4='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 15), @p4='?' (Size = 6)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 6), @p4='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 15), @p4='?' (Size = 6)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 6), @p4='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 15), @p4='?' (Size = 6)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 6), @p4='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 15), @p4='?' (Size = 6)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 6), @p4='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 15), @p4='?' (Size = 6)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 6), @p4='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 15), @p4='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 6), @p4='?' (Size = 8)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 15), @p4='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 6), @p4='?' (Size = 8)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 15), @p4='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 6), @p4='?' (Size = 8)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 15), @p4='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 6), @p4='?' (Size = 8)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 15), @p4='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 6), @p4='?' (Size = 8)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 15), @p4='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 6), @p4='?' (Size = 8)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 15), @p4='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 6), @p4='?' (Size = 8)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 15), @p4='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 6), @p4='?' (Size = 8)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 15), @p4='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 6), @p4='?' (Size = 8)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 15), @p4='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 6), @p4='?' (Size = 8)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 15), @p4='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Double), @p1='?' (DbType = Double), @p2='?' (Size = 60), @p3='?' (Size = 6), @p4='?' (Size = 8)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Users" ("Latitude", "Longitude", "PasswordHash", "Role", "Username")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."Latitude", "u"."Longitude", "u"."PasswordHash", "u"."Role", "u"."Username"
+      FROM "Users" AS "u"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Wallets" ("UserId", "Balance")
+      VALUES (@p0, @p1);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@Format='?' (Size = 6)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."Latitude", "u"."Longitude", "u"."PasswordHash", "u"."Role", "u"."Username"
+      FROM "Users" AS "u"
+      WHERE "u"."Username" = @Format
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@Format='?' (Size = 6)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."Latitude", "u"."Longitude", "u"."PasswordHash", "u"."Role", "u"."Username"
+      FROM "Users" AS "u"
+      WHERE "u"."Username" = @Format
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@Format='?' (Size = 6)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."Latitude", "u"."Longitude", "u"."PasswordHash", "u"."Role", "u"."Username"
+      FROM "Users" AS "u"
+      WHERE "u"."Username" = @Format
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@Format='?' (Size = 6)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."Latitude", "u"."Longitude", "u"."PasswordHash", "u"."Role", "u"."Username"
+      FROM "Users" AS "u"
+      WHERE "u"."Username" = @Format
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@Format='?' (Size = 6)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."Latitude", "u"."Longitude", "u"."PasswordHash", "u"."Role", "u"."Username"
+      FROM "Users" AS "u"
+      WHERE "u"."Username" = @Format
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@Format='?' (Size = 6)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."Latitude", "u"."Longitude", "u"."PasswordHash", "u"."Role", "u"."Username"
+      FROM "Users" AS "u"
+      WHERE "u"."Username" = @Format
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@Format='?' (Size = 6)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."Latitude", "u"."Longitude", "u"."PasswordHash", "u"."Role", "u"."Username"
+      FROM "Users" AS "u"
+      WHERE "u"."Username" = @Format
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@Format='?' (Size = 6)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."Latitude", "u"."Longitude", "u"."PasswordHash", "u"."Role", "u"."Username"
+      FROM "Users" AS "u"
+      WHERE "u"."Username" = @Format
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@Format='?' (Size = 6)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."Latitude", "u"."Longitude", "u"."PasswordHash", "u"."Role", "u"."Username"
+      FROM "Users" AS "u"
+      WHERE "u"."Username" = @Format
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@Format='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."Latitude", "u"."Longitude", "u"."PasswordHash", "u"."Role", "u"."Username"
+      FROM "Users" AS "u"
+      WHERE "u"."Username" = @Format
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@Format='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."Latitude", "u"."Longitude", "u"."PasswordHash", "u"."Role", "u"."Username"
+      FROM "Users" AS "u"
+      WHERE "u"."Username" = @Format
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@Format='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."Latitude", "u"."Longitude", "u"."PasswordHash", "u"."Role", "u"."Username"
+      FROM "Users" AS "u"
+      WHERE "u"."Username" = @Format
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@Format='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."Latitude", "u"."Longitude", "u"."PasswordHash", "u"."Role", "u"."Username"
+      FROM "Users" AS "u"
+      WHERE "u"."Username" = @Format
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@Format='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."Latitude", "u"."Longitude", "u"."PasswordHash", "u"."Role", "u"."Username"
+      FROM "Users" AS "u"
+      WHERE "u"."Username" = @Format
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@Format='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."Latitude", "u"."Longitude", "u"."PasswordHash", "u"."Role", "u"."Username"
+      FROM "Users" AS "u"
+      WHERE "u"."Username" = @Format
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@Format='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."Latitude", "u"."Longitude", "u"."PasswordHash", "u"."Role", "u"."Username"
+      FROM "Users" AS "u"
+      WHERE "u"."Username" = @Format
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@Format='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."Latitude", "u"."Longitude", "u"."PasswordHash", "u"."Role", "u"."Username"
+      FROM "Users" AS "u"
+      WHERE "u"."Username" = @Format
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@Format='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."Latitude", "u"."Longitude", "u"."PasswordHash", "u"."Role", "u"."Username"
+      FROM "Users" AS "u"
+      WHERE "u"."Username" = @Format
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@Format='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."Latitude", "u"."Longitude", "u"."PasswordHash", "u"."Role", "u"."Username"
+      FROM "Users" AS "u"
+      WHERE "u"."Username" = @Format
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@Format='?' (Size = 7)], CommandType='Text', CommandTimeout='30']
+      SELECT "u"."Id", "u"."Latitude", "u"."Longitude", "u"."PasswordHash", "u"."Role", "u"."Username"
+      FROM "Users" AS "u"
+      WHERE "u"."Username" = @Format
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (Size = 33), @p1='?' (Size = 23), @p2='?' (DbType = Double), @p3='?' (DbType = Double), @p4='?' (Size = 15), @p5='?' (DbType = Int32), @p6='?' (DbType = Double)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Restaurants" ("Description", "ImageUrl", "Latitude", "Longitude", "Name", "OwnerId", "ServiceRadiusKm")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (Size = 33), @p1='?' (Size = 23), @p2='?' (DbType = Double), @p3='?' (DbType = Double), @p4='?' (Size = 15), @p5='?' (DbType = Int32), @p6='?' (DbType = Double)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Restaurants" ("Description", "ImageUrl", "Latitude", "Longitude", "Name", "OwnerId", "ServiceRadiusKm")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (Size = 33), @p1='?' (Size = 23), @p2='?' (DbType = Double), @p3='?' (DbType = Double), @p4='?' (Size = 15), @p5='?' (DbType = Int32), @p6='?' (DbType = Double)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Restaurants" ("Description", "ImageUrl", "Latitude", "Longitude", "Name", "OwnerId", "ServiceRadiusKm")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (Size = 33), @p1='?' (Size = 23), @p2='?' (DbType = Double), @p3='?' (DbType = Double), @p4='?' (Size = 15), @p5='?' (DbType = Int32), @p6='?' (DbType = Double)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Restaurants" ("Description", "ImageUrl", "Latitude", "Longitude", "Name", "OwnerId", "ServiceRadiusKm")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (Size = 33), @p1='?' (Size = 23), @p2='?' (DbType = Double), @p3='?' (DbType = Double), @p4='?' (Size = 15), @p5='?' (DbType = Int32), @p6='?' (DbType = Double)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Restaurants" ("Description", "ImageUrl", "Latitude", "Longitude", "Name", "OwnerId", "ServiceRadiusKm")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (Size = 33), @p1='?' (Size = 23), @p2='?' (DbType = Double), @p3='?' (DbType = Double), @p4='?' (Size = 15), @p5='?' (DbType = Int32), @p6='?' (DbType = Double)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Restaurants" ("Description", "ImageUrl", "Latitude", "Longitude", "Name", "OwnerId", "ServiceRadiusKm")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (Size = 33), @p1='?' (Size = 23), @p2='?' (DbType = Double), @p3='?' (DbType = Double), @p4='?' (Size = 15), @p5='?' (DbType = Int32), @p6='?' (DbType = Double)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Restaurants" ("Description", "ImageUrl", "Latitude", "Longitude", "Name", "OwnerId", "ServiceRadiusKm")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (Size = 33), @p1='?' (Size = 23), @p2='?' (DbType = Double), @p3='?' (DbType = Double), @p4='?' (Size = 15), @p5='?' (DbType = Int32), @p6='?' (DbType = Double)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Restaurants" ("Description", "ImageUrl", "Latitude", "Longitude", "Name", "OwnerId", "ServiceRadiusKm")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (Size = 33), @p1='?' (Size = 23), @p2='?' (DbType = Double), @p3='?' (DbType = Double), @p4='?' (Size = 15), @p5='?' (DbType = Int32), @p6='?' (DbType = Double)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Restaurants" ("Description", "ImageUrl", "Latitude", "Longitude", "Name", "OwnerId", "ServiceRadiusKm")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (Size = 34), @p1='?' (Size = 23), @p2='?' (DbType = Double), @p3='?' (DbType = Double), @p4='?' (Size = 16), @p5='?' (DbType = Int32), @p6='?' (DbType = Double)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Restaurants" ("Description", "ImageUrl", "Latitude", "Longitude", "Name", "OwnerId", "ServiceRadiusKm")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (Size = 34), @p1='?' (Size = 23), @p2='?' (DbType = Double), @p3='?' (DbType = Double), @p4='?' (Size = 16), @p5='?' (DbType = Int32), @p6='?' (DbType = Double)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Restaurants" ("Description", "ImageUrl", "Latitude", "Longitude", "Name", "OwnerId", "ServiceRadiusKm")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (Size = 34), @p1='?' (Size = 23), @p2='?' (DbType = Double), @p3='?' (DbType = Double), @p4='?' (Size = 16), @p5='?' (DbType = Int32), @p6='?' (DbType = Double)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Restaurants" ("Description", "ImageUrl", "Latitude", "Longitude", "Name", "OwnerId", "ServiceRadiusKm")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (Size = 34), @p1='?' (Size = 23), @p2='?' (DbType = Double), @p3='?' (DbType = Double), @p4='?' (Size = 16), @p5='?' (DbType = Int32), @p6='?' (DbType = Double)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Restaurants" ("Description", "ImageUrl", "Latitude", "Longitude", "Name", "OwnerId", "ServiceRadiusKm")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (Size = 34), @p1='?' (Size = 23), @p2='?' (DbType = Double), @p3='?' (DbType = Double), @p4='?' (Size = 16), @p5='?' (DbType = Int32), @p6='?' (DbType = Double)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Restaurants" ("Description", "ImageUrl", "Latitude", "Longitude", "Name", "OwnerId", "ServiceRadiusKm")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (Size = 34), @p1='?' (Size = 23), @p2='?' (DbType = Double), @p3='?' (DbType = Double), @p4='?' (Size = 16), @p5='?' (DbType = Int32), @p6='?' (DbType = Double)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Restaurants" ("Description", "ImageUrl", "Latitude", "Longitude", "Name", "OwnerId", "ServiceRadiusKm")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (Size = 34), @p1='?' (Size = 23), @p2='?' (DbType = Double), @p3='?' (DbType = Double), @p4='?' (Size = 16), @p5='?' (DbType = Int32), @p6='?' (DbType = Double)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Restaurants" ("Description", "ImageUrl", "Latitude", "Longitude", "Name", "OwnerId", "ServiceRadiusKm")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (Size = 34), @p1='?' (Size = 23), @p2='?' (DbType = Double), @p3='?' (DbType = Double), @p4='?' (Size = 16), @p5='?' (DbType = Int32), @p6='?' (DbType = Double)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Restaurants" ("Description", "ImageUrl", "Latitude", "Longitude", "Name", "OwnerId", "ServiceRadiusKm")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (Size = 34), @p1='?' (Size = 23), @p2='?' (DbType = Double), @p3='?' (DbType = Double), @p4='?' (Size = 16), @p5='?' (DbType = Int32), @p6='?' (DbType = Double)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Restaurants" ("Description", "ImageUrl", "Latitude", "Longitude", "Name", "OwnerId", "ServiceRadiusKm")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (Size = 34), @p1='?' (Size = 23), @p2='?' (DbType = Double), @p3='?' (DbType = Double), @p4='?' (Size = 16), @p5='?' (DbType = Int32), @p6='?' (DbType = Double)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Restaurants" ("Description", "ImageUrl", "Latitude", "Longitude", "Name", "OwnerId", "ServiceRadiusKm")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (Size = 34), @p1='?' (Size = 23), @p2='?' (DbType = Double), @p3='?' (DbType = Double), @p4='?' (Size = 16), @p5='?' (DbType = Int32), @p6='?' (DbType = Double)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Restaurants" ("Description", "ImageUrl", "Latitude", "Longitude", "Name", "OwnerId", "ServiceRadiusKm")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6)
+      RETURNING "Id";
+fail: Microsoft.EntityFrameworkCore.Database.Command[20102]
+      Failed executing DbCommand (1ms) [Parameters=[@p0='?' (Size = 6), @p1='?' (Size = 15), @p2='?' (DbType = Decimal), @p3='?' (DbType = Int32), @p4='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Foods" ("Category", "Name", "Price", "RestaurantId", "StockQuantity")
+      VALUES (@p0, @p1, @p2, @p3, @p4)
+      RETURNING "Id", "RowVersion";
+fail: Microsoft.EntityFrameworkCore.Update[10000]
+      An exception occurred in the database while saving changes for context type 'DanialNetFood.Web.Data.ApplicationDbContext'.
+      Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
+       ---> Microsoft.Data.Sqlite.SqliteException (0x80004005): SQLite Error 19: 'NOT NULL constraint failed: Foods.RowVersion'.
+         at Microsoft.Data.Sqlite.SqliteException.ThrowExceptionForRC(Int32 rc, sqlite3 db)
+         at Microsoft.Data.Sqlite.SqliteDataReader.NextResult()
+         at Microsoft.Data.Sqlite.SqliteCommand.ExecuteReader(CommandBehavior behavior)
+         at Microsoft.Data.Sqlite.SqliteCommand.ExecuteDbDataReader(CommandBehavior behavior)
+         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReader(RelationalCommandParameterObject parameterObject)
+         at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.Execute(IRelationalConnection connection)
+         --- End of inner exception stack trace ---
+         at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.Execute(IRelationalConnection connection)
+         at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.Execute(IEnumerable`1 commandBatches, IRelationalConnection connection)
+         at Microsoft.EntityFrameworkCore.Storage.RelationalDatabase.SaveChanges(IList`1 entries)
+         at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(IList`1 entriesToSave)
+         at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(StateManager stateManager, Boolean acceptAllChangesOnSuccess)
+         at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.<>c.<SaveChanges>b__114_0(DbContext _, ValueTuple`2 t)
+         at Microsoft.EntityFrameworkCore.Storage.NonRetryingExecutionStrategy.Execute[TState,TResult](TState state, Func`3 operation, Func`3 verifySucceeded)
+         at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(Boolean acceptAllChangesOnSuccess)
+         at Microsoft.EntityFrameworkCore.DbContext.SaveChanges(Boolean acceptAllChangesOnSuccess)
+      Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
+       ---> Microsoft.Data.Sqlite.SqliteException (0x80004005): SQLite Error 19: 'NOT NULL constraint failed: Foods.RowVersion'.
+         at Microsoft.Data.Sqlite.SqliteException.ThrowExceptionForRC(Int32 rc, sqlite3 db)
+         at Microsoft.Data.Sqlite.SqliteDataReader.NextResult()
+         at Microsoft.Data.Sqlite.SqliteCommand.ExecuteReader(CommandBehavior behavior)
+         at Microsoft.Data.Sqlite.SqliteCommand.ExecuteDbDataReader(CommandBehavior behavior)
+         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReader(RelationalCommandParameterObject parameterObject)
+         at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.Execute(IRelationalConnection connection)
+         --- End of inner exception stack trace ---
+         at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.Execute(IRelationalConnection connection)
+         at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.Execute(IEnumerable`1 commandBatches, IRelationalConnection connection)
+         at Microsoft.EntityFrameworkCore.Storage.RelationalDatabase.SaveChanges(IList`1 entries)
+         at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(IList`1 entriesToSave)
+         at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(StateManager stateManager, Boolean acceptAllChangesOnSuccess)
+         at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.<>c.<SaveChanges>b__114_0(DbContext _, ValueTuple`2 t)
+         at Microsoft.EntityFrameworkCore.Storage.NonRetryingExecutionStrategy.Execute[TState,TResult](TState state, Func`3 operation, Func`3 verifySucceeded)
+         at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(Boolean acceptAllChangesOnSuccess)
+         at Microsoft.EntityFrameworkCore.DbContext.SaveChanges(Boolean acceptAllChangesOnSuccess)
+Unhandled exception. Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
+ ---> Microsoft.Data.Sqlite.SqliteException (0x80004005): SQLite Error 19: 'NOT NULL constraint failed: Foods.RowVersion'.
+   at Microsoft.Data.Sqlite.SqliteException.ThrowExceptionForRC(Int32 rc, sqlite3 db)
+   at Microsoft.Data.Sqlite.SqliteDataReader.NextResult()
+   at Microsoft.Data.Sqlite.SqliteCommand.ExecuteReader(CommandBehavior behavior)
+   at Microsoft.Data.Sqlite.SqliteCommand.ExecuteDbDataReader(CommandBehavior behavior)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReader(RelationalCommandParameterObject parameterObject)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.Execute(IRelationalConnection connection)
+   --- End of inner exception stack trace ---
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.Execute(IRelationalConnection connection)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.Execute(IEnumerable`1 commandBatches, IRelationalConnection connection)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalDatabase.SaveChanges(IList`1 entries)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(IList`1 entriesToSave)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(StateManager stateManager, Boolean acceptAllChangesOnSuccess)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.<>c.<SaveChanges>b__114_0(DbContext _, ValueTuple`2 t)
+   at Microsoft.EntityFrameworkCore.Storage.NonRetryingExecutionStrategy.Execute[TState,TResult](TState state, Func`3 operation, Func`3 verifySucceeded)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(Boolean acceptAllChangesOnSuccess)
+   at Microsoft.EntityFrameworkCore.DbContext.SaveChanges(Boolean acceptAllChangesOnSuccess)
+   at Microsoft.EntityFrameworkCore.DbContext.SaveChanges()
+   at DanialNetFood.Web.Data.DbInitializer.Seed(ApplicationDbContext context) in /app/DanialNetFood/DanialNetFood.Web/Data/DbInitializer.cs:line 62
+   at Program.<Main>$(String[] args) in /app/DanialNetFood/DanialNetFood.Web/Program.cs:line 78

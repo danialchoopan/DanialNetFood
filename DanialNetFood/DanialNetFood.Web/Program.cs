@@ -1,6 +1,7 @@
 using DanialNetFood.Web.Data;
 using DanialNetFood.Web.Data.UnitOfWork;
 using DanialNetFood.Web.Hubs;
+using DanialNetFood.Web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,10 +10,29 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews().AddNewtonsoftJson();
 
+var dbProvider = builder.Configuration["DatabaseProvider"] ?? "Sqlite";
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite("Data Source=danialnetfood.db"));
+{
+    switch (dbProvider)
+    {
+        case "SqlServer":
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+            break;
+        case "PostgreSQL":
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+            break;
+        default:
+            options.UseSqlite("Data Source=danialnetfood.db");
+            break;
+    }
+});
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddSingleton<IKillSwitchService, KillSwitchService>();
+builder.Services.AddScoped<IPricingService, PricingService>();
+builder.Services.AddScoped<ILocationService, LocationService>();
+builder.Services.AddScoped<IWalletService, WalletService>();
+builder.Services.AddMemoryCache();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -39,14 +59,10 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-// app.UseHttpsRedirection(); // Disabled for sandbox simplicity
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.UseSession();
 
 app.MapControllerRoute(
@@ -55,12 +71,10 @@ app.MapControllerRoute(
 
 app.MapHub<OrderHub>("/orderHub");
 
-// Seeding logic (Call it here or via a tool)
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<ApplicationDbContext>();
-    context.Database.EnsureCreated();
     DbInitializer.Seed(context);
 }
 

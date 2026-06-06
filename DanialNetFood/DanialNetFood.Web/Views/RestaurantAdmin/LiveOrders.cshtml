@@ -1,0 +1,77 @@
+@model List<DanialNetFood.Web.Models.Order>
+@{
+    ViewData["Title"] = "کارتابل زنده سفارشات";
+    Layout = "_RestaurantAdminLayout";
+}
+
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 h-full" id="orderPipeline">
+    <!-- New Orders -->
+    <div class="bg-gray-200 p-4 rounded-lg flex flex-col">
+        <h3 class="font-bold text-center mb-4 border-b pb-2">سفارشات جدید</h3>
+        <div id="status-Pending" class="space-y-4 flex-1">
+            @foreach (var order in Model.Where(o => o.Status == "Pending"))
+            {
+                <partial name="_OrderCard" model="order" />
+            }
+        </div>
+    </div>
+
+    <!-- Preparing -->
+    <div class="bg-blue-50 p-4 rounded-lg flex flex-col">
+        <h3 class="font-bold text-center mb-4 border-b pb-2 text-blue-700">در حال آماده‌سازی</h3>
+        <div id="status-Preparing" class="space-y-4 flex-1">
+            @foreach (var order in Model.Where(o => o.Status == "Preparing" || o.Status == "Confirmed"))
+            {
+                <partial name="_OrderCard" model="order" />
+            }
+        </div>
+    </div>
+
+    <!-- Ready for Pickup -->
+    <div class="bg-yellow-50 p-4 rounded-lg flex flex-col">
+        <h3 class="font-bold text-center mb-4 border-b pb-2 text-yellow-700">آماده تحویل به پیک</h3>
+        <div id="status-ReadyForPickup" class="space-y-4 flex-1">
+            @foreach (var order in Model.Where(o => o.Status == "ReadyForPickup"))
+            {
+                <partial name="_OrderCard" model="order" />
+            }
+        </div>
+    </div>
+
+    <!-- Out for Delivery -->
+    <div class="bg-green-50 p-4 rounded-lg flex flex-col">
+        <h3 class="font-bold text-center mb-4 border-b pb-2 text-green-700">ارسال شده</h3>
+        <div id="status-OutForDelivery" class="space-y-4 flex-1">
+            @foreach (var order in Model.Where(o => o.Status == "OutForDelivery"))
+            {
+                <partial name="_OrderCard" model="order" />
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/orderHub")
+            .build();
+
+        connection.on("ReceiveNewOrder", function (order) {
+            document.getElementById("notificationSound").play();
+            // Logic to append new order card to Pending column
+            location.reload(); // Simple for now, ideally AJAX render
+        });
+
+        connection.start().then(function () {
+            connection.invoke("JoinRestaurantGroup", "@ViewBag.RestaurantId");
+        });
+
+        function updateStatus(orderId, newStatus) {
+            $.post("/RestaurantAdmin/UpdateStatus", { orderId: orderId, status: newStatus }, function(data) {
+                if(data.success) {
+                    location.reload();
+                }
+            });
+        }
+    </script>
+}

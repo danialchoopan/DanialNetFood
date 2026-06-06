@@ -1,0 +1,111 @@
+@model IEnumerable<DanialNetFood.Web.Models.Order>
+@{
+    ViewData["Title"] = "تجزیه و تحلیل فروش";
+    Layout = "_SuperAdminLayout";
+}
+
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div class="text-gray-500 text-sm mb-2">فروش کل پلتفرم</div>
+        <div class="text-2xl font-bold text-slate-900">@ViewBag.TotalSales.ToString("N0") تومان</div>
+    </div>
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div class="text-gray-500 text-sm mb-2">سود سایت (کارمزد ۱۵٪)</div>
+        <div class="text-2xl font-bold text-blue-600">@ViewBag.TotalCommission.ToString("N0") تومان</div>
+    </div>
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div class="text-gray-500 text-sm mb-2">تعداد کل سفارشات</div>
+        <div class="text-2xl font-bold text-slate-900">@ViewBag.OrderCount</div>
+    </div>
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div class="text-gray-500 text-sm mb-2">سفارشات در انتظار</div>
+        <div class="text-2xl font-bold text-amber-600">@ViewBag.PendingOrders</div>
+    </div>
+</div>
+
+<div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100 mb-8">
+    <h3 class="font-bold mb-6">نمودار رشد فروش ماهانه</h3>
+    <canvas id="salesChart" height="100"></canvas>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="p-6 border-b border-gray-100">
+        <h3 class="font-bold text-slate-800">آخرین تراکنش‌ها</h3>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-right">
+            <thead>
+                <tr class="bg-slate-50 text-slate-500 text-sm">
+                    <th class="p-4">شناسه</th>
+                    <th class="p-4">رستوران</th>
+                    <th class="p-4">مبلغ</th>
+                    <th class="p-4">وضعیت</th>
+                    <th class="p-4">عملیات</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.Take(10))
+                {
+                    <tr class="border-b border-gray-50 hover:bg-slate-50 transition-colors">
+                        <td class="p-4 font-mono text-sm">#@order.Id</td>
+                        <td class="p-4 text-sm">رستوران شماره @order.RestaurantId</td>
+                        <td class="p-4 font-bold text-sm">@order.TotalAmount.ToString("N0")</td>
+                        <td class="p-4 text-xs">
+                            <span class="px-2 py-1 rounded-full @(order.Status == "Pending" ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700")">
+                                @order.Status
+                            </span>
+                        </td>
+                        <td class="p-4">
+                             <select onchange="updateStatus(@order.Id, this.value)" class="bg-slate-100 border-none rounded text-xs p-1">
+                                <option value="">تغییر وضعیت</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Preparing">Preparing</option>
+                                <option value="Delivered">Delivered</option>
+                            </select>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/lib/chartjs/chart.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $.get('/SuperAdmin/GetSalesData', function(response) {
+                const ctx = document.getElementById('salesChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: response.labels,
+                        datasets: [{
+                            label: 'فروش (تومان)',
+                            data: response.data,
+                            borderColor: '#2563eb',
+                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                labels: { font: { family: 'Vazirmatn' } }
+                            }
+                        }
+                    }
+                });
+            });
+        });
+
+        function updateStatus(orderId, status) {
+            if (!status) return;
+            $.post('/SuperAdmin/UpdateStatus', { orderId: orderId, status: status }, function() {
+                location.reload();
+            });
+        }
+    </script>
+}

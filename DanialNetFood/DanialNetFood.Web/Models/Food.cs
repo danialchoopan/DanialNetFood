@@ -13,5 +13,12 @@ namespace DanialNetFood.Web.Models
         public int RestaurantId { get; set; }
         [ForeignKey("RestaurantId")]
         public Restaurant Restaurant { get; set; } = null!;
+
+        public int StockQuantity { get; set; }
+
+        [Timestamp]
+        public byte[] RowVersion { get; set; } = null!;
+
+        public List<FoodOption> Options { get; set; } = new();
     }
 }
